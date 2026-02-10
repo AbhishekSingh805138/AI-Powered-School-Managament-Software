@@ -46,7 +46,7 @@ const AIChat = () => {
         <button
           data-testid="open-chat-button"
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 p-4 bg-[#7C3AED] text-white rounded-full shadow-2xl hover:-translate-y-1 hover:shadow-3xl transition-all duration-300 z-50"
+          className="fixed bottom-20 right-6 p-4 bg-[#7C3AED] text-white rounded-full shadow-2xl hover:-translate-y-1 hover:shadow-3xl transition-all duration-300 z-[9999]"
         >
           <Sparkles className="w-6 h-6" />
         </button>
