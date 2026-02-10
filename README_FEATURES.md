@@ -5,6 +5,7 @@
 ### Core Features
 - ✅ **Multi-tenant Architecture** - Multiple schools in one system with data isolation
 - ✅ **Role-Based Access Control** - 5 user types (Super Admin, School Admin, Teacher, Student, Parent)
+- ✅ **Real-Time Notifications** - WebSocket-powered instant alerts with browser notifications
 - ✅ **Student Management** - Complete CRUD operations with bulk CSV import
 - ✅ **Teacher Management** - Staff management with subject assignments
 - ✅ **Attendance Tracking** - Mark and monitor student attendance
@@ -15,6 +16,25 @@
 - ✅ **Dashboard Analytics** - Real-time statistics and insights
 - ✅ **Bulk Import** - CSV upload for students and teachers
 - ✅ **Downloadable Reports** - Attendance, Grades, and Student reports in CSV
+
+### 🔔 Real-Time Notification System
+
+**Live notifications via WebSocket:**
+- 📚 **Assignment Notifications** - Students instantly notified when teachers create assignments
+- 💰 **Fee Payment Alerts** - Admins get real-time updates when fees are paid
+- 📊 **Attendance Updates** - Instant alerts for attendance marking
+- 🔄 **Auto-Reconnection** - WebSocket automatically reconnects if connection drops
+- 🖥️ **Browser Notifications** - Desktop notifications when app is in background
+- 🔴 **Unread Badge** - Visual indicator showing unread notification count
+- ✅ **Mark as Read** - Individual or bulk mark-all-read functionality
+- 🗑️ **Delete Notifications** - Remove notifications you no longer need
+
+**How it Works:**
+1. WebSocket connection established on login
+2. Notifications stored in MongoDB and pushed via WebSocket
+3. Red badge shows unread count
+4. Click bell to see notification dropdown
+5. Browser notifications appear even when tab is inactive
 
 ### 📧 Email Notifications (Ready to Activate)
 
