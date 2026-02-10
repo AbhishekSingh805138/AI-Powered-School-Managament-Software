@@ -349,16 +349,4 @@ const SchoolAdminDashboard: React.FC = () => {
   );
 };
 
-const StatCard = ({ icon, title, value, color }) => {
-  return (
-    <div className="bg-white border border-[#0F2F24]/10 rounded-xl p-6 hover:-translate-y-1 transition-all duration-300">
-      <div className={`inline-flex p-3 rounded-lg ${color} mb-4`}>
-        {icon}
-      </div>
-      <h3 className="text-[#52525B] text-sm font-medium mb-1">{title}</h3>
-      <p className="text-3xl font-semibold text-[#0F2F24] font-mono">{value}</p>
-    </div>
-  );
-};
-
 export default SchoolAdminDashboard;
