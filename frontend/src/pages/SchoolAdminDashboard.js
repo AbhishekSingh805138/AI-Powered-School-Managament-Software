@@ -110,14 +110,24 @@ const SchoolAdminDashboard = () => {
             <h1 className="text-2xl font-semibold text-[#0F2F24]">School Admin Dashboard</h1>
             <p className="text-sm text-[#52525B]">{user?.full_name}</p>
           </div>
-          <button
-            data-testid="logout-button"
-            onClick={logout}
-            className="flex items-center gap-2 px-4 py-2 text-[#52525B] hover:text-[#0F2F24] transition-colors"
-          >
-            <LogOut className="w-5 h-5" />
-            Logout
-          </button>
+          <div className="flex gap-3">
+            <button
+              data-testid="import-button"
+              onClick={() => setShowImportModal(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-[#0F2F24] text-white rounded-full font-medium hover:-translate-y-0.5 transition-all duration-300"
+            >
+              <Upload className="w-4 h-4" />
+              Import
+            </button>
+            <button
+              data-testid="logout-button"
+              onClick={logout}
+              className="flex items-center gap-2 px-4 py-2 text-[#52525B] hover:text-[#0F2F24] transition-colors"
+            >
+              <LogOut className="w-5 h-5" />
+              Logout
+            </button>
+          </div>
         </div>
       </nav>
 
@@ -161,6 +171,39 @@ const SchoolAdminDashboard = () => {
             />
           </div>
         )}
+
+        <div className="mb-8 bg-white border border-[#0F2F24]/10 rounded-xl p-6">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-xl font-semibold text-[#0F2F24]">Download Reports</h3>
+            <FileDown className="w-5 h-5 text-[#52525B]" />
+          </div>
+          <div className="grid md:grid-cols-3 gap-4">
+            <button
+              data-testid="download-attendance-report"
+              onClick={() => downloadReport('attendance')}
+              className="flex items-center justify-center gap-2 p-4 bg-[#F5F5F0] border border-[#0F2F24]/10 rounded-lg hover:-translate-y-1 transition-all duration-300"
+            >
+              <FileSpreadsheet className="w-5 h-5 text-[#0F2F24]" />
+              <span className="font-medium text-[#0F2F24]">Attendance Report</span>
+            </button>
+            <button
+              data-testid="download-grades-report"
+              onClick={() => downloadReport('grades')}
+              className="flex items-center justify-center gap-2 p-4 bg-[#F5F5F0] border border-[#0F2F24]/10 rounded-lg hover:-translate-y-1 transition-all duration-300"
+            >
+              <FileSpreadsheet className="w-5 h-5 text-[#0F2F24]" />
+              <span className="font-medium text-[#0F2F24]">Grades Report</span>
+            </button>
+            <button
+              data-testid="download-students-report"
+              onClick={() => downloadReport('students')}
+              className="flex items-center justify-center gap-2 p-4 bg-[#F5F5F0] border border-[#0F2F24]/10 rounded-lg hover:-translate-y-1 transition-all duration-300"
+            >
+              <FileSpreadsheet className="w-5 h-5 text-[#0F2F24]" />
+              <span className="font-medium text-[#0F2F24]">Students Report</span>
+            </button>
+          </div>
+        </div>
 
         <div className="grid lg:grid-cols-2 gap-8 mb-8">
           <div className="bg-white border border-[#0F2F24]/10 rounded-xl p-6">
@@ -211,6 +254,73 @@ const SchoolAdminDashboard = () => {
           </div>
         </div>
       </div>
+
+      {showImportModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-6 z-50">
+          <div className="bg-white rounded-2xl p-8 max-w-md w-full">
+            <h3 className="text-2xl font-semibold text-[#0F2F24] mb-6">Bulk Import</h3>
+            
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-[#0F2F24] mb-2">Import Type</label>
+              <select
+                data-testid="import-type-select"
+                value={importType}
+                onChange={(e) => setImportType(e.target.value)}
+                className="w-full px-4 py-3 border border-[#0F2F24]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F2F24] bg-[#F5F5F0]"
+              >
+                <option value="students">Students</option>
+                <option value="teachers">Teachers</option>
+              </select>
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-[#0F2F24] mb-2">Upload CSV File</label>
+              <input
+                data-testid="import-file-input"
+                type="file"
+                accept=".csv"
+                onChange={(e) => setImportFile(e.target.files[0])}
+                className="w-full px-4 py-3 border border-[#0F2F24]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F2F24] bg-[#F5F5F0]"
+              />
+            </div>
+
+            <button
+              onClick={() => downloadSampleCSV(importType)}
+              className="w-full mb-4 px-4 py-2 text-sm text-[#0F2F24] border border-[#0F2F24]/20 rounded-lg hover:bg-[#F5F5F0] transition-colors"
+            >
+              Download Sample CSV
+            </button>
+
+            {importMessage && (
+              <div className={`mb-4 p-3 rounded-lg ${importMessage.includes('Successfully') ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
+                {importMessage}
+              </div>
+            )}
+
+            <div className="flex gap-3">
+              <button
+                data-testid="cancel-import-button"
+                onClick={() => {
+                  setShowImportModal(false);
+                  setImportFile(null);
+                  setImportMessage('');
+                }}
+                className="flex-1 px-6 py-3 border border-[#0F2F24]/20 text-[#0F2F24] rounded-full font-medium hover:-translate-y-0.5 transition-all duration-300"
+              >
+                Cancel
+              </button>
+              <button
+                data-testid="submit-import-button"
+                onClick={handleImport}
+                disabled={!importFile || importing}
+                className="flex-1 px-6 py-3 bg-[#0F2F24] text-white rounded-full font-medium hover:-translate-y-0.5 hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {importing ? 'Importing...' : 'Import'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <AIChat />
     </div>
