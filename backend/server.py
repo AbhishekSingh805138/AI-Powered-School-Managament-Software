@@ -669,6 +669,29 @@ async def create_assignment(assignment: AssignmentCreate, current_user: dict = D
     
     await db.assignments.insert_one(assignment_doc)
     assignment_doc.pop("_id")
+    
+    # Send notifications to students in the grade
+    students = await db.students.find({
+        "tenant_id": current_user["tenant_id"],
+        "grade": assignment.grade
+    }, {"_id": 0}).to_list(1000)
+    
+    # Find student user accounts and notify them
+    student_emails = [s["email"] for s in students]
+    student_users = await db.users.find({
+        "email": {"$in": student_emails},
+        "role": "student"
+    }, {"_id": 0}).to_list(1000)
+    
+    for student_user in student_users:
+        await create_notification(
+            title="New Assignment",
+            message=f"New assignment '{assignment.title}' for {assignment.subject}. Due: {assignment.due_date}",
+            notification_type="assignment",
+            user_id=student_user["id"],
+            tenant_id=current_user["tenant_id"]
+        )
+    
     return assignment_doc
 
 @api_router.get("/assignments", response_model=List[Assignment])
