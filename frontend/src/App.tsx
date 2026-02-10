@@ -33,7 +33,12 @@ export const useAuth = (): AuthContextType => {
   return context;
 };
 
-const ProtectedRoute = ({ children, allowedRoles }) => {
+interface ProtectedRouteProps {
+  children: ReactNode;
+  allowedRoles?: string[];
+}
+
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
 
   if (loading) {
@@ -52,12 +57,12 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
     return <Navigate to="/" />;
   }
 
-  return children;
+  return <>{children}</>;
 };
 
 function App() {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -69,9 +74,9 @@ function App() {
     }
   }, []);
 
-  const fetchUser = async () => {
+  const fetchUser = async (): Promise<void> => {
     try {
-      const response = await axios.get(`${API}/auth/me`);
+      const response = await axios.get<User>(`${API}/auth/me`);
       setUser(response.data);
     } catch (error) {
       console.error('Failed to fetch user:', error);
@@ -82,7 +87,7 @@ function App() {
     }
   };
 
-  const login = async (email, password) => {
+  const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
     try {
       const response = await axios.post(`${API}/auth/login`, { email, password });
       const { access_token } = response.data;
@@ -90,24 +95,33 @@ function App() {
       axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
       await fetchUser();
       return { success: true };
-    } catch (error) {
+    } catch (error: any) {
       return { success: false, error: error.response?.data?.detail || 'Login failed' };
     }
   };
 
-  const register = async (userData) => {
+  const register = async (userData: any): Promise<{ success: boolean; error?: string }> => {
     try {
       await axios.post(`${API}/auth/register`, userData);
       return await login(userData.email, userData.password);
-    } catch (error) {
+    } catch (error: any) {
       return { success: false, error: error.response?.data?.detail || 'Registration failed' };
     }
   };
 
-  const logout = () => {
+  const logout = (): void => {
     localStorage.removeItem('token');
     delete axios.defaults.headers.common['Authorization'];
     setUser(null);
+  };
+
+  const authValue: AuthContextType = {
+    user,
+    login,
+    register,
+    logout,
+    loading,
+    API
   };
 
   return (
