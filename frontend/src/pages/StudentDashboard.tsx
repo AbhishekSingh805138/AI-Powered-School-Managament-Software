@@ -46,11 +46,6 @@ const StudentDashboard: React.FC = () => {
           </div>
         </div>
       </nav>
-            <LogOut className="w-5 h-5" />
-            Logout
-          </button>
-        </div>
-      </nav>
 
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="mb-8">
