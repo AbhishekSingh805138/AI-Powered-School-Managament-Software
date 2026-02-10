@@ -84,7 +84,7 @@ const NotificationBell: React.FC = () => {
                 </div>
               ) : (
                 <div className="divide-y divide-[#0F2F24]/10">
-                  {notifications.map((notification: Notification) => (
+                  {notifications.map((notification: NotificationData) => (
                     <div
                       key={notification.id}
                       data-testid={`notification-item-${notification.id}`}
