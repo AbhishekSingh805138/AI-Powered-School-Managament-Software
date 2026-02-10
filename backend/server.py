@@ -433,6 +433,40 @@ async def get_teachers(current_user: dict = Depends(get_current_user)):
     teachers = await db.teachers.find({"tenant_id": current_user["tenant_id"]}, {"_id": 0}).to_list(1000)
     return teachers
 
+@api_router.post("/teachers/bulk-import")
+async def bulk_import_teachers(file: UploadFile = File(...), current_user: dict = Depends(get_current_user)):
+    if current_user["role"] not in ["super_admin", "school_admin"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    try:
+        contents = await file.read()
+        df = pd.read_csv(io.StringIO(contents.decode('utf-8')))
+        
+        required_columns = ['first_name', 'last_name', 'email', 'qualification']
+        if not all(col in df.columns for col in required_columns):
+            raise HTTPException(status_code=400, detail=f"CSV must contain columns: {', '.join(required_columns)}")
+        
+        teachers_added = 0
+        for _, row in df.iterrows():
+            subjects = str(row.get('subjects', '')).split(';') if 'subjects' in df.columns else []
+            teacher_doc = {
+                "id": str(uuid.uuid4()),
+                "tenant_id": current_user["tenant_id"],
+                "first_name": str(row['first_name']),
+                "last_name": str(row['last_name']),
+                "email": str(row['email']),
+                "subjects": subjects,
+                "qualification": str(row['qualification']),
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "is_active": True
+            }
+            await db.teachers.insert_one(teacher_doc)
+            teachers_added += 1
+        
+        return {"message": f"Successfully imported {teachers_added} teachers"}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Failed to import CSV: {str(e)}")
+
 # Attendance Routes
 @api_router.post("/attendance", response_model=Attendance)
 async def mark_attendance(attendance: AttendanceCreate, current_user: dict = Depends(get_current_user)):
