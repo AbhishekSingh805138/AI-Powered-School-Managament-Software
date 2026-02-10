@@ -3,21 +3,21 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../App';
 import { GraduationCap, Mail, Lock, User, Building2 } from 'lucide-react';
 
-const LoginPage = () => {
-  const [isLogin, setIsLogin] = useState(true);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [fullName, setFullName] = useState('');
-  const [role, setRole] = useState('student');
-  const [tenantId, setTenantId] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+const LoginPage: React.FC = () => {
+  const [isLogin, setIsLogin] = useState<boolean>(true);
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [fullName, setFullName] = useState<string>('');
+  const [role, setRole] = useState<string>('student');
+  const [tenantId, setTenantId] = useState<string>('');
+  const [error, setError] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
   const { login, register, user } = useAuth();
   const navigate = useNavigate();
 
   React.useEffect(() => {
     if (user) {
-      const roleRoutes = {
+      const roleRoutes: Record<string, string> = {
         super_admin: '/super-admin',
         school_admin: '/school-admin',
         teacher: '/teacher',
@@ -28,7 +28,7 @@ const LoginPage = () => {
     }
   }, [user, navigate]);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     setError('');
     setLoading(true);
@@ -47,7 +47,7 @@ const LoginPage = () => {
     }
 
     if (!result.success) {
-      setError(result.error);
+      setError(result.error || 'An error occurred');
     }
     setLoading(false);
   };
