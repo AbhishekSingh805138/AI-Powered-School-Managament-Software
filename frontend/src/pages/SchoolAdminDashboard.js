@@ -3,6 +3,7 @@ import { useAuth } from '../App';
 import axios from 'axios';
 import { Users, BookOpen, Calendar, DollarSign, LogOut, TrendingUp, UserPlus, Upload, FileDown, FileSpreadsheet } from 'lucide-react';
 import AIChat from '../components/AIChat';
+import NotificationBell from '../components/NotificationBell';
 
 const SchoolAdminDashboard = () => {
   const { user, logout, API } = useAuth();
