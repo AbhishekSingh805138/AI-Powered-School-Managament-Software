@@ -1,18 +1,28 @@
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import { Notification, User } from '@/types';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const WS_URL = BACKEND_URL.replace('https://', 'wss://').replace('http://', 'ws://');
+const WS_URL = BACKEND_URL!.replace('https://', 'wss://').replace('http://', 'ws://');
 
-export const useNotifications = (user) => {
-  const [notifications, setNotifications] = useState([]);
-  const [unreadCount, setUnreadCount] = useState(0);
-  const wsRef = useRef(null);
-  const reconnectTimeoutRef = useRef(null);
+interface UseNotificationsReturn {
+  notifications: Notification[];
+  unreadCount: number;
+  markAsRead: (notificationId: string) => Promise<void>;
+  markAllAsRead: () => Promise<void>;
+  deleteNotification: (notificationId: string) => Promise<void>;
+  refreshNotifications: () => Promise<void>;
+}
 
-  const fetchNotifications = async () => {
+export const useNotifications = (user: User | null): UseNotificationsReturn => {
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [unreadCount, setUnreadCount] = useState<number>(0);
+  const wsRef = useRef<WebSocket | null>(null);
+  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const fetchNotifications = async (): Promise<void> => {
     try {
-      const response = await axios.get(`${BACKEND_URL}/api/notifications`);
+      const response = await axios.get<Notification[]>(`${BACKEND_URL}/api/notifications`);
       setNotifications(response.data);
       setUnreadCount(response.data.filter(n => !n.read).length);
     } catch (error) {
@@ -20,36 +30,34 @@ export const useNotifications = (user) => {
     }
   };
 
-  const connectWebSocket = () => {
+  const connectWebSocket = (): void => {
     if (!user) return;
 
     const token = localStorage.getItem('token');
     if (!token) return;
 
     try {
-      const ws = new WebSocket(`${WS_URL}/api/ws/notifications?token=${token}`);
+      const ws = new WebSocket(`${WS_URL}/api/notifications/ws?token=${token}`);
       
       ws.onopen = () => {
         console.log('WebSocket connected');
         wsRef.current = ws;
         
-        // Send ping every 30 seconds to keep connection alive
         const pingInterval = setInterval(() => {
           if (ws.readyState === WebSocket.OPEN) {
             ws.send('ping');
           }
         }, 30000);
         
-        ws.pingInterval = pingInterval;
+        (ws as any).pingInterval = pingInterval;
       };
 
-      ws.onmessage = (event) => {
+      ws.onmessage = (event: MessageEvent) => {
         try {
-          const notification = JSON.parse(event.data);
+          const notification: Notification = JSON.parse(event.data);
           setNotifications(prev => [notification, ...prev]);
           setUnreadCount(prev => prev + 1);
           
-          // Show browser notification if permitted
           if (Notification.permission === 'granted') {
             new Notification(notification.title, {
               body: notification.message,
@@ -61,17 +69,16 @@ export const useNotifications = (user) => {
         }
       };
 
-      ws.onerror = (error) => {
+      ws.onerror = (error: Event) => {
         console.error('WebSocket error:', error);
       };
 
       ws.onclose = () => {
         console.log('WebSocket disconnected');
-        if (ws.pingInterval) {
-          clearInterval(ws.pingInterval);
+        if ((ws as any).pingInterval) {
+          clearInterval((ws as any).pingInterval);
         }
         
-        // Attempt to reconnect after 5 seconds
         reconnectTimeoutRef.current = setTimeout(() => {
           connectWebSocket();
         }, 5000);
@@ -88,7 +95,6 @@ export const useNotifications = (user) => {
       fetchNotifications();
       connectWebSocket();
 
-      // Request notification permission
       if (Notification.permission === 'default') {
         Notification.requestPermission();
       }
@@ -96,8 +102,8 @@ export const useNotifications = (user) => {
 
     return () => {
       if (wsRef.current) {
-        if (wsRef.current.pingInterval) {
-          clearInterval(wsRef.current.pingInterval);
+        if ((wsRef.current as any).pingInterval) {
+          clearInterval((wsRef.current as any).pingInterval);
         }
         wsRef.current.close();
       }
@@ -107,7 +113,7 @@ export const useNotifications = (user) => {
     };
   }, [user]);
 
-  const markAsRead = async (notificationId) => {
+  const markAsRead = async (notificationId: string): Promise<void> => {
     try {
       await axios.put(`${BACKEND_URL}/api/notifications/${notificationId}/read`);
       setNotifications(prev =>
@@ -119,7 +125,7 @@ export const useNotifications = (user) => {
     }
   };
 
-  const markAllAsRead = async () => {
+  const markAllAsRead = async (): Promise<void> => {
     try {
       await axios.put(`${BACKEND_URL}/api/notifications/read-all`);
       setNotifications(prev => prev.map(n => ({ ...n, read: true })));
@@ -129,7 +135,7 @@ export const useNotifications = (user) => {
     }
   };
 
-  const deleteNotification = async (notificationId) => {
+  const deleteNotification = async (notificationId: string): Promise<void> => {
     try {
       await axios.delete(`${BACKEND_URL}/api/notifications/${notificationId}`);
       setNotifications(prev => prev.filter(n => n.id !== notificationId));
