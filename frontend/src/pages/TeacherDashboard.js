@@ -3,6 +3,7 @@ import { useAuth } from '../App';
 import axios from 'axios';
 import { BookOpen, Users, ClipboardCheck, LogOut, Calendar } from 'lucide-react';
 import AIChat from '../components/AIChat';
+import NotificationBell from '../components/NotificationBell';
 
 const TeacherDashboard = () => {
   const { user, logout, API } = useAuth();
@@ -34,14 +35,17 @@ const TeacherDashboard = () => {
             <h1 className="text-2xl font-semibold text-[#0F2F24]">Teacher Dashboard</h1>
             <p className="text-sm text-[#52525B]">{user?.full_name}</p>
           </div>
-          <button
-            data-testid="logout-button"
-            onClick={logout}
-            className="flex items-center gap-2 px-4 py-2 text-[#52525B] hover:text-[#0F2F24] transition-colors"
-          >
-            <LogOut className="w-5 h-5" />
-            Logout
-          </button>
+          <div className="flex items-center gap-3">
+            <NotificationBell />
+            <button
+              data-testid="logout-button"
+              onClick={logout}
+              className="flex items-center gap-2 px-4 py-2 text-[#52525B] hover:text-[#0F2F24] transition-colors"
+            >
+              <LogOut className="w-5 h-5" />
+              Logout
+            </button>
+          </div>
         </div>
       </nav>
 
