@@ -111,7 +111,8 @@ const SchoolAdminDashboard = () => {
             <h1 className="text-2xl font-semibold text-[#0F2F24]">School Admin Dashboard</h1>
             <p className="text-sm text-[#52525B]">{user?.full_name}</p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex items-center gap-3">
+            <NotificationBell />
             <button
               data-testid="import-button"
               onClick={() => setShowImportModal(true)}
