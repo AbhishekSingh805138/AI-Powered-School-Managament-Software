@@ -287,7 +287,7 @@ const SchoolAdminDashboard: React.FC = () => {
               <select
                 data-testid="import-type-select"
                 value={importType}
-                onChange={(e) => setImportType(e.target.value)}
+                onChange={(e) => setImportType(e.target.value as 'students' | 'teachers')}
                 className="w-full px-4 py-3 border border-[#0F2F24]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F2F24] bg-[#F5F5F0]"
               >
                 <option value="students">Students</option>
