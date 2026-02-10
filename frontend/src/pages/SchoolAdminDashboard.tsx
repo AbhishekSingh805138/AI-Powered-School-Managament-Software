@@ -301,7 +301,7 @@ const SchoolAdminDashboard: React.FC = () => {
                 data-testid="import-file-input"
                 type="file"
                 accept=".csv"
-                onChange={(e) => setImportFile(e.target.files[0])}
+                onChange={(e) => setImportFile(e.target.files?.[0] || null)}
                 className="w-full px-4 py-3 border border-[#0F2F24]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F2F24] bg-[#F5F5F0]"
               />
             </div>
