@@ -4,28 +4,48 @@ import axios from 'axios';
 import { Users, BookOpen, Calendar, DollarSign, LogOut, TrendingUp, UserPlus, Upload, FileDown, FileSpreadsheet } from 'lucide-react';
 import AIChat from '../components/AIChat';
 import NotificationBell from '../components/NotificationBell';
+import { DashboardStats, Student, Teacher } from '@/types';
 
-const SchoolAdminDashboard = () => {
+interface StatCardProps {
+  icon: React.ReactNode;
+  title: string;
+  value: number;
+  color: string;
+}
+
+const StatCard: React.FC<StatCardProps> = ({ icon, title, value, color }) => {
+  return (
+    <div className="bg-white border border-[#0F2F24]/10 rounded-xl p-6 hover:-translate-y-1 transition-all duration-300">
+      <div className={`inline-flex p-3 rounded-lg ${color} mb-4`}>
+        {icon}
+      </div>
+      <h3 className="text-[#52525B] text-sm font-medium mb-1">{title}</h3>
+      <p className="text-3xl font-semibold text-[#0F2F24] font-mono">{value}</p>
+    </div>
+  );
+};
+
+const SchoolAdminDashboard: React.FC = () => {
   const { user, logout, API } = useAuth();
-  const [stats, setStats] = useState(null);
-  const [students, setStudents] = useState([]);
-  const [teachers, setTeachers] = useState([]);
-  const [showImportModal, setShowImportModal] = useState(false);
-  const [importType, setImportType] = useState('students');
-  const [importFile, setImportFile] = useState(null);
-  const [importing, setImporting] = useState(false);
-  const [importMessage, setImportMessage] = useState('');
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [students, setStudents] = useState<Student[]>([]);
+  const [teachers, setTeachers] = useState<Teacher[]>([]);
+  const [showImportModal, setShowImportModal] = useState<boolean>(false);
+  const [importType, setImportType] = useState<'students' | 'teachers'>('students');
+  const [importFile, setImportFile] = useState<File | null>(null);
+  const [importing, setImporting] = useState<boolean>(false);
+  const [importMessage, setImportMessage] = useState<string>('');
 
   useEffect(() => {
     fetchDashboardData();
   }, []);
 
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = async (): Promise<void> => {
     try {
       const [statsRes, studentsRes, teachersRes] = await Promise.all([
-        axios.get(`${API}/dashboard/stats`),
-        axios.get(`${API}/students`),
-        axios.get(`${API}/teachers`)
+        axios.get<DashboardStats>(`${API}/dashboard/stats`),
+        axios.get<Student[]>(`${API}/students`),
+        axios.get<Teacher[]>(`${API}/teachers`)
       ]);
       setStats(statsRes.data);
       setStudents(studentsRes.data);
@@ -35,7 +55,7 @@ const SchoolAdminDashboard = () => {
     }
   };
 
-  const handleImport = async () => {
+  const handleImport = async (): Promise<void> => {
     if (!importFile) return;
     
     setImporting(true);
@@ -54,14 +74,14 @@ const SchoolAdminDashboard = () => {
       setImportFile(null);
       fetchDashboardData();
       setTimeout(() => setShowImportModal(false), 2000);
-    } catch (error) {
+    } catch (error: any) {
       setImportMessage(error.response?.data?.detail || 'Import failed');
     } finally {
       setImporting(false);
     }
   };
 
-  const downloadReport = async (reportType) => {
+  const downloadReport = async (reportType: 'attendance' | 'grades' | 'students'): Promise<void> => {
     try {
       const endpoints = {
         attendance: '/reports/attendance',
@@ -85,7 +105,7 @@ const SchoolAdminDashboard = () => {
     }
   };
 
-  const downloadSampleCSV = (type) => {
+  const downloadSampleCSV = (type: 'students' | 'teachers'): void => {
     let csvContent = '';
     if (type === 'students') {
       csvContent = 'first_name,last_name,email,grade,date_of_birth,parent_email\\nJohn,Doe,john@example.com,5,2015-01-15,parent@example.com\\n';
