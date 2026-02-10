@@ -3,13 +3,29 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../App';
 import { GraduationCap, Users, BookOpen, TrendingUp, Sparkles } from 'lucide-react';
 
-const LandingPage = () => {
+interface FeatureCardProps {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+}
+
+const FeatureCard: React.FC<FeatureCardProps> = ({ icon, title, description }) => {
+  return (
+    <div className="p-6 bg-[#F5F5F0] border border-[#0F2F24]/10 rounded-xl hover:-translate-y-1 transition-all duration-300">
+      <div className="text-[#0F2F24] mb-4">{icon}</div>
+      <h3 className="text-xl font-semibold text-[#0F2F24] mb-2">{title}</h3>
+      <p className="text-[#52525B]">{description}</p>
+    </div>
+  );
+};
+
+const LandingPage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
   React.useEffect(() => {
     if (user) {
-      const roleRoutes = {
+      const roleRoutes: Record<string, string> = {
         super_admin: '/super-admin',
         school_admin: '/school-admin',
         teacher: '/teacher',
