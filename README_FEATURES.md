@@ -144,6 +144,13 @@ Bob,Williams,bob@school.com,MA English,English;Literature
 - `GET /api/fees` - Get fees (filter by student_id, status)
 - `PUT /api/fees/{id}/pay` - Mark fee as paid
 
+### Notifications (Real-Time)
+- `WebSocket /api/ws/notifications?token={jwt}` - Connect to notification stream
+- `GET /api/notifications` - Get all notifications (query param: unread_only)
+- `PUT /api/notifications/{id}/read` - Mark notification as read
+- `PUT /api/notifications/read-all` - Mark all notifications as read
+- `DELETE /api/notifications/{id}` - Delete notification
+
 ### Reports
 - `GET /api/reports/attendance` - Download attendance report CSV
 - `GET /api/reports/grades` - Download grades report CSV
