@@ -773,6 +773,75 @@ async def generate_students_report(current_user: dict = Depends(get_current_user
         headers={"Content-Disposition": f"attachment; filename=students_report.csv"}
     )
 
+# Email Notification Routes (Placeholder - activate with Resend API key)
+class EmailNotification(BaseModel):
+    recipient_email: EmailStr
+    subject: str
+    message: str
+
+@api_router.post("/notifications/assignment")
+async def send_assignment_notification(assignment_id: str, current_user: dict = Depends(get_current_user)):
+    """
+    Send email notification for new assignment.
+    TODO: Add Resend API key to .env to activate email sending.
+    RESEND_API_KEY=re_your_key_here
+    """
+    if current_user["role"] not in ["teacher", "school_admin", "super_admin"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    assignment = await db.assignments.find_one({"id": assignment_id, "tenant_id": current_user["tenant_id"]}, {"_id": 0})
+    if not assignment:
+        raise HTTPException(status_code=404, detail="Assignment not found")
+    
+    # Get students in the grade
+    students = await db.students.find({
+        "tenant_id": current_user["tenant_id"],
+        "grade": assignment["grade"]
+    }, {"_id": 0}).to_list(1000)
+    
+    # Placeholder: Log instead of sending
+    logger.info(f"[PLACEHOLDER] Would send assignment notification to {len(students)} students")
+    logger.info(f"Assignment: {assignment['title']} - Due: {assignment['due_date']}")
+    
+    # When Resend is configured, this will actually send emails
+    return {
+        "status": "placeholder",
+        "message": f"Email notifications prepared for {len(students)} students. Add RESEND_API_KEY to .env to activate.",
+        "recipients": len(students)
+    }
+
+@api_router.post("/notifications/fee-reminder")
+async def send_fee_reminder(student_id: str, current_user: dict = Depends(get_current_user)):
+    """
+    Send fee reminder email to parent.
+    TODO: Add Resend API key to .env to activate email sending.
+    """
+    if current_user["role"] not in ["school_admin", "super_admin"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    student = await db.students.find_one({"id": student_id, "tenant_id": current_user["tenant_id"]}, {"_id": 0})
+    if not student:
+        raise HTTPException(status_code=404, detail="Student not found")
+    
+    pending_fees = await db.fees.find({
+        "tenant_id": current_user["tenant_id"],
+        "student_id": student_id,
+        "status": "pending"
+    }, {"_id": 0}).to_list(100)
+    
+    total_pending = sum([fee["amount"] for fee in pending_fees])
+    
+    # Placeholder: Log instead of sending
+    logger.info(f"[PLACEHOLDER] Would send fee reminder to {student['parent_email']}")
+    logger.info(f"Student: {student['first_name']} {student['last_name']} - Total pending: ${total_pending}")
+    
+    return {
+        "status": "placeholder",
+        "message": f"Fee reminder prepared for {student['parent_email']}. Add RESEND_API_KEY to .env to activate.",
+        "total_pending": total_pending,
+        "fee_count": len(pending_fees)
+    }
+
 app.include_router(api_router)
 
 app.add_middleware(
