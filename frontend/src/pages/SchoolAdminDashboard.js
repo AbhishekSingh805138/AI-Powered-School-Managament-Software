@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../App';
 import axios from 'axios';
-import { Users, BookOpen, Calendar, DollarSign, LogOut, TrendingUp, UserPlus } from 'lucide-react';
+import { Users, BookOpen, Calendar, DollarSign, LogOut, TrendingUp, UserPlus, Upload, FileDown, FileSpreadsheet } from 'lucide-react';
 import AIChat from '../components/AIChat';
 
 const SchoolAdminDashboard = () => {
@@ -9,6 +9,11 @@ const SchoolAdminDashboard = () => {
   const [stats, setStats] = useState(null);
   const [students, setStudents] = useState([]);
   const [teachers, setTeachers] = useState([]);
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [importType, setImportType] = useState('students');
+  const [importFile, setImportFile] = useState(null);
+  const [importing, setImporting] = useState(false);
+  const [importMessage, setImportMessage] = useState('');
 
   useEffect(() => {
     fetchDashboardData();
@@ -27,6 +32,74 @@ const SchoolAdminDashboard = () => {
     } catch (error) {
       console.error('Failed to fetch dashboard data:', error);
     }
+  };
+
+  const handleImport = async () => {
+    if (!importFile) return;
+    
+    setImporting(true);
+    setImportMessage('');
+    
+    try {
+      const formData = new FormData();
+      formData.append('file', importFile);
+      
+      const endpoint = importType === 'students' ? '/students/bulk-import' : '/teachers/bulk-import';
+      const response = await axios.post(`${API}${endpoint}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      
+      setImportMessage(response.data.message);
+      setImportFile(null);
+      fetchDashboardData();
+      setTimeout(() => setShowImportModal(false), 2000);
+    } catch (error) {
+      setImportMessage(error.response?.data?.detail || 'Import failed');
+    } finally {
+      setImporting(false);
+    }
+  };
+
+  const downloadReport = async (reportType) => {
+    try {
+      const endpoints = {
+        attendance: '/reports/attendance',
+        grades: '/reports/grades',
+        students: '/reports/students'
+      };
+      
+      const response = await axios.get(`${API}${endpoints[reportType]}`, {
+        responseType: 'blob'
+      });
+      
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `${reportType}_report.csv`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (error) {
+      console.error('Failed to download report:', error);
+    }
+  };
+
+  const downloadSampleCSV = (type) => {
+    let csvContent = '';
+    if (type === 'students') {
+      csvContent = 'first_name,last_name,email,grade,date_of_birth,parent_email\\nJohn,Doe,john@example.com,5,2015-01-15,parent@example.com\\n';
+    } else {
+      csvContent = 'first_name,last_name,email,qualification,subjects\\nJane,Smith,jane@example.com,MSc Physics,Physics;Chemistry\\n';
+    }
+    
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `${type}_sample.csv`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
   };
 
   return (
