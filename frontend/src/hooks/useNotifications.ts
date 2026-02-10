@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { Notification, User } from '@/types';
+import { NotificationData, User } from '@/types';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const WS_URL = BACKEND_URL!.replace('https://', 'wss://').replace('http://', 'ws://');
 
 interface UseNotificationsReturn {
-  notifications: Notification[];
+  notifications: NotificationData[];
   unreadCount: number;
   markAsRead: (notificationId: string) => Promise<void>;
   markAllAsRead: () => Promise<void>;
@@ -15,14 +15,14 @@ interface UseNotificationsReturn {
 }
 
 export const useNotifications = (user: User | null): UseNotificationsReturn => {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [notifications, setNotifications] = useState<NotificationData[]>([]);
   const [unreadCount, setUnreadCount] = useState<number>(0);
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const fetchNotifications = async (): Promise<void> => {
     try {
-      const response = await axios.get<Notification[]>(`${BACKEND_URL}/api/notifications`);
+      const response = await axios.get<NotificationData[]>(`${BACKEND_URL}/api/notifications`);
       setNotifications(response.data);
       setUnreadCount(response.data.filter(n => !n.read).length);
     } catch (error) {
@@ -54,12 +54,12 @@ export const useNotifications = (user: User | null): UseNotificationsReturn => {
 
       ws.onmessage = (event: MessageEvent) => {
         try {
-          const notification: Notification = JSON.parse(event.data);
+          const notification: NotificationData = JSON.parse(event.data);
           setNotifications(prev => [notification, ...prev]);
           setUnreadCount(prev => prev + 1);
           
-          if (Notification.permission === 'granted') {
-            new Notification(notification.title, {
+          if (window.Notification.permission === 'granted') {
+            new window.Notification(notification.title, {
               body: notification.message,
               icon: '/logo192.png'
             });
@@ -95,8 +95,8 @@ export const useNotifications = (user: User | null): UseNotificationsReturn => {
       fetchNotifications();
       connectWebSocket();
 
-      if (Notification.permission === 'default') {
-        Notification.requestPermission();
+      if (window.Notification.permission === 'default') {
+        window.Notification.requestPermission();
       }
     }
 
