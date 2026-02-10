@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Bell, X, Check, CheckCheck } from 'lucide-react';
 import { useNotifications } from '../hooks/useNotifications';
 import { useAuth } from '../App';
-import { Notification } from '@/types';
+import { NotificationData } from '@/types';
 
 const NotificationBell: React.FC = () => {
   const { user } = useAuth();
