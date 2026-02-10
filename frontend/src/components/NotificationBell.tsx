@@ -2,14 +2,15 @@ import React, { useState } from 'react';
 import { Bell, X, Check, CheckCheck } from 'lucide-react';
 import { useNotifications } from '../hooks/useNotifications';
 import { useAuth } from '../App';
+import { Notification } from '@/types';
 
-const NotificationBell = () => {
+const NotificationBell: React.FC = () => {
   const { user } = useAuth();
   const { notifications, unreadCount, markAsRead, markAllAsRead, deleteNotification } = useNotifications(user);
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  const getNotificationIcon = (type) => {
-    const icons = {
+  const getNotificationIcon = (type: string): string => {
+    const icons: Record<string, string> = {
       assignment: '📚',
       fee: '💰',
       attendance: '📅',
@@ -18,10 +19,10 @@ const NotificationBell = () => {
     return icons[type] || '🔔';
   };
 
-  const formatTime = (dateString) => {
+  const formatTime = (dateString: string): string => {
     const date = new Date(dateString);
     const now = new Date();
-    const diffMs = now - date;
+    const diffMs = now.getTime() - date.getTime();
     const diffMins = Math.floor(diffMs / 60000);
     const diffHours = Math.floor(diffMs / 3600000);
     const diffDays = Math.floor(diffMs / 86400000);
@@ -83,7 +84,7 @@ const NotificationBell = () => {
                 </div>
               ) : (
                 <div className="divide-y divide-[#0F2F24]/10">
-                  {notifications.map((notification) => (
+                  {notifications.map((notification: Notification) => (
                     <div
                       key={notification.id}
                       data-testid={`notification-item-${notification.id}`}
