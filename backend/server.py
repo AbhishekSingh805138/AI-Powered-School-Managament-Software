@@ -275,6 +275,18 @@ class ChatResponse(BaseModel):
     response: str
     session_id: str
 
+class NotificationBase(BaseModel):
+    title: str
+    message: str
+    type: str  # assignment, fee, attendance, system
+    user_id: str
+    read: bool = False
+
+class Notification(NotificationBase):
+    id: str
+    tenant_id: str
+    created_at: str
+
 # Auth Routes
 @api_router.post("/auth/register", response_model=User)
 async def register(user: UserCreate):
