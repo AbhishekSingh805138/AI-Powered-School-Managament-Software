@@ -793,6 +793,10 @@ async def get_fees(student_id: Optional[str] = None, status: Optional[str] = Non
 
 @api_router.put("/fees/{fee_id}/pay")
 async def pay_fee(fee_id: str, current_user: dict = Depends(get_current_user)):
+    fee = await db.fees.find_one({"id": fee_id, "tenant_id": current_user["tenant_id"]}, {"_id": 0})
+    if not fee:
+        raise HTTPException(status_code=404, detail="Fee not found")
+    
     result = await db.fees.update_one(
         {"id": fee_id, "tenant_id": current_user["tenant_id"]},
         {"$set": {"status": "paid", "paid_date": datetime.now(timezone.utc).isoformat()}}
@@ -800,6 +804,24 @@ async def pay_fee(fee_id: str, current_user: dict = Depends(get_current_user)):
     
     if result.modified_count == 0:
         raise HTTPException(status_code=404, detail="Fee not found")
+    
+    # Notify school admin
+    admins = await db.users.find({
+        "tenant_id": current_user["tenant_id"],
+        "role": {"$in": ["school_admin", "super_admin"]}
+    }, {"_id": 0}).to_list(100)
+    
+    student = await db.students.find_one({"id": fee["student_id"]}, {"_id": 0})
+    student_name = f"{student['first_name']} {student['last_name']}" if student else "Student"
+    
+    for admin in admins:
+        await create_notification(
+            title="Fee Payment Received",
+            message=f"${fee['amount']} payment received for {student_name}",
+            notification_type="fee",
+            user_id=admin["id"],
+            tenant_id=current_user["tenant_id"]
+        )
     
     return {"message": "Fee paid successfully"}
 
