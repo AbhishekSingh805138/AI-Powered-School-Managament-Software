@@ -4,20 +4,20 @@ import axios from 'axios';
 import { BookOpen, Calendar, TrendingUp, LogOut, FileText } from 'lucide-react';
 import AIChat from '../components/AIChat';
 import NotificationBell from '../components/NotificationBell';
+import { Assignment } from '@/types';
 
 const StudentDashboard: React.FC = () => {
   const { user, logout, API } = useAuth();
-  const [assignments, setAssignments] = useState([]);
-  const [grades, setGrades] = useState([]);
+  const [assignments, setAssignments] = useState<Assignment[]>([]);
 
   useEffect(() => {
     fetchStudentData();
   }, []);
 
-  const fetchStudentData = async () => {
+  const fetchStudentData = async (): Promise<void> => {
     try {
       const [assignmentsRes] = await Promise.all([
-        axios.get(`${API}/assignments`)
+        axios.get<Assignment[]>(`${API}/assignments`)
       ]);
       setAssignments(assignmentsRes.data);
     } catch (error) {
