@@ -1,0 +1,135 @@
+{
+  "identity": {
+    "name": "E1",
+    "archetype": "The Ivy League Futurist",
+    "tone": "Prestigious, Intelligent, Calm, Organized",
+    "principles": [
+      "Fusion over Imitation: Mix Academic Tradition with SaaS Speed",
+      "Emotion First: Inspire Trust and Clarity",
+      "Content is King: Data must be beautiful and legible",
+      "Negative Space: Use breathing room to reduce cognitive load",
+      "Contrast: Deep Greens vs. Warm Bones vs. Electric AI Accents"
+    ]
+  },
+  "typography": {
+    "headings": {
+      "family": "Fraunces, 'Playfair Display', serif",
+      "weight": "600",
+      "style": "Expert",
+      "notes": "Use for all H1-H3. Adds an 'institutional' and 'premium' feel."
+    },
+    "body": {
+      "family": "Manrope, 'DM Sans', sans-serif",
+      "notes": "High legibility, modern humanist feel. Use for all UI elements."
+    },
+    "mono": {
+      "family": "'JetBrains Mono', monospace",
+      "notes": "Use for grades, IDs, and tabular data."
+    }
+  },
+  "colors": {
+    "theme_strategy": "light_preferred_with_dark_toggle",
+    "palette": {
+      "primary": {
+        "name": "Oxford Green",
+        "hex": "#0F2F24",
+        "tailwind": "bg-[#0F2F24] text-white"
+      },
+      "secondary": {
+        "name": "Bone",
+        "hex": "#F5F5F0",
+        "tailwind": "bg-[#F5F5F0]"
+      },
+      "accent": {
+        "name": "Electric Violet (AI)",
+        "hex": "#7C3AED",
+        "tailwind": "text-[#7C3AED] bg-[#7C3AED]"
+      },
+      "surface": {
+        "light": "#FFFFFF",
+        "dark": "#0A0A0A"
+      },
+      "text": {
+        "primary": "#1A1A1A",
+        "secondary": "#52525B",
+        "muted": "#A1A1AA"
+      }
+    },
+    "gradients": {
+      "ai_glow": "bg-gradient-to-r from-violet-600 to-indigo-600",
+      "glass": "bg-white/70 backdrop-blur-xl border border-white/20"
+    }
+  },
+  "layout_strategy": {
+    "dashboard": {
+      "type": "Bento Grid",
+      "notes": "Use 'Cardless' look where possible. Use borders to separate grid items instead of shadows. Keep density high for Admin, low for Students."
+    },
+    "marketing": {
+      "type": "Asymmetrical Editorial",
+      "notes": "Mix large serif typography with large imagery. Avoid standard 'Hero Center' layouts."
+    }
+  },
+  "components": {
+    "buttons": {
+      "style": "Pill-shaped or Sharp Rectangles",
+      "default": "px-6 py-2 rounded-full font-medium transition-transform active:scale-95"
+    },
+    "cards": {
+      "style": "Flat with Border",
+      "classes": "bg-white border border-border/60 rounded-xl p-6"
+    },
+    "inputs": {
+      "style": "Understated",
+      "classes": "bg-transparent border-b border-border focus:border-primary focus:ring-0 rounded-none px-0"
+    },
+    "tables": {
+      "style": "Clean Rows",
+      "classes": "w-full border-collapse",
+      "row_classes": "border-b border-border/50 hover:bg-secondary/30 transition-colors"
+    }
+  },
+  "assets": {
+    "images": [
+      {
+        "category": "hero",
+        "url": "https://images.unsplash.com/photo-1721702754494-fdd7189f946c?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1ODB8MHwxfHNlYXJjaHwyfHxtb2Rlcm4lMjBkaXZlcnNlJTIwc3R1ZGVudHMlMjBzdHVkeWluZyUyMHVuaXZlcnNpdHklMjBsaWJyYXJ5fGVufDB8fHx8MTc3MDczODM4NXww&ixlib=rb-4.1.0&q=85",
+        "description": "Library hero background, large diverse group"
+      },
+      {
+        "category": "teacher",
+        "url": "https://images.unsplash.com/photo-1577896851231-70ef18881754?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMjh8MHwxfHNlYXJjaHwyfHx0ZWFjaGVyJTIwY2xhc3Nyb29tfGVufDB8fHx8MTc3MDczODM5NXww&ixlib=rb-4.1.0&q=85",
+        "description": "Teacher standing in front of class, authentic"
+      },
+      {
+        "category": "parent_student",
+        "url": "https://images.unsplash.com/photo-1758525860435-502240649c59?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzNTl8MHwxfHNlYXJjaHwxfHxwYXJlbnQlMjBoZWxwaW5nJTIwY2hpbGQlMjBzdHVkeXxlbnwwfHx8fDE3NzA3MzgzOTZ8MA&ixlib=rb-4.1.0&q=85",
+        "description": "Parent helping student at home"
+      },
+      {
+        "category": "building",
+        "url": "https://images.pexels.com/photos/18435276/pexels-photo-18435276.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+        "description": "Modern architecture for login/school profile"
+      },
+      {
+        "category": "ai_abstract",
+        "url": "https://images.unsplash.com/photo-1767473907132-9e52351d023a?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1OTN8MHwxfHNlYXJjaHwyfHxhYnN0cmFjdCUyMGdlb21ldHJpYyUyMHNoYXBlcyUyMDNkJTIwZ3JhZGllbnR8ZW58MHx8fHwxNzcwNzM4Mzk3fDA&ixlib=rb-4.1.0&q=85",
+        "description": "Abstract shapes for AI assistant background"
+      }
+    ],
+    "icons": "Use 'lucide-react' for general UI. Use 'phosphor-icons' for specific educational metaphors if needed."
+  },
+  "motion": {
+    "transitions": "transition-all duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)]",
+    "enter": "animate-in fade-in slide-in-from-bottom-4 duration-500",
+    "hover": "hover:-translate-y-0.5 hover:shadow-md"
+  },
+  "universal_guidelines": [
+    "Do not use gradients for main backgrounds, use solid Bone/Off-white.",
+    "Use deep green for primary actions, not blue.",
+    "Ensure all text is readable (WCAG AA).",
+    "Add 'data-testid' to all interactive elements.",
+    "Use 'Sonner' for toasts.",
+    "Marketing pages must use custom HTML/Tailwind, NOT Shadcn cards."
+  ]
+}
