@@ -344,6 +344,78 @@ async def register(user: UserCreate):
     user_doc.pop("_id")
     return user_doc
 
+# WebSocket Route
+@api_router.websocket("/ws/notifications")
+async def websocket_notifications(websocket: WebSocket, token: str):
+    try:
+        # Verify token
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id = payload.get("sub")
+        if not user_id:
+            await websocket.close(code=1008)
+            return
+        
+        user = await db.users.find_one({"id": user_id}, {"_id": 0})
+        if not user:
+            await websocket.close(code=1008)
+            return
+        
+        await manager.connect(websocket, user_id, user["tenant_id"])
+        
+        try:
+            while True:
+                # Keep connection alive and listen for pings
+                data = await websocket.receive_text()
+                if data == "ping":
+                    await websocket.send_text("pong")
+        except WebSocketDisconnect:
+            manager.disconnect(websocket, user_id, user["tenant_id"])
+    except Exception as e:
+        logger.error(f"WebSocket error: {str(e)}")
+        await websocket.close()
+
+# Notification Routes
+@api_router.get("/notifications", response_model=List[Notification])
+async def get_notifications(unread_only: bool = False, current_user: dict = Depends(get_current_user)):
+    query = {"user_id": current_user["id"], "tenant_id": current_user["tenant_id"]}
+    if unread_only:
+        query["read"] = False
+    
+    notifications = await db.notifications.find(query, {"_id": 0}).sort("created_at", -1).to_list(100)
+    return notifications
+
+@api_router.put("/notifications/{notification_id}/read")
+async def mark_notification_read(notification_id: str, current_user: dict = Depends(get_current_user)):
+    result = await db.notifications.update_one(
+        {"id": notification_id, "user_id": current_user["id"]},
+        {"$set": {"read": True}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Notification not found")
+    
+    return {"message": "Notification marked as read"}
+
+@api_router.put("/notifications/read-all")
+async def mark_all_notifications_read(current_user: dict = Depends(get_current_user)):
+    await db.notifications.update_many(
+        {"user_id": current_user["id"], "read": False},
+        {"$set": {"read": True}}
+    )
+    
+    return {"message": "All notifications marked as read"}
+
+@api_router.delete("/notifications/{notification_id}")
+async def delete_notification(notification_id: str, current_user: dict = Depends(get_current_user)):
+    result = await db.notifications.delete_one(
+        {"id": notification_id, "user_id": current_user["id"]}
+    )
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Notification not found")
+    
+    return {"message": "Notification deleted"}
+
 @api_router.post("/auth/login", response_model=Token)
 async def login(user_login: UserLogin):
     user = await db.users.find_one({"email": user_login.email}, {"_id": 0})
