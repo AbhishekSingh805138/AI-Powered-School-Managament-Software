@@ -55,7 +55,7 @@ const AIChat = () => {
       {isOpen && (
         <div
           data-testid="chat-widget"
-          className="fixed bottom-6 right-6 w-96 h-[600px] bg-white border border-[#0F2F24]/10 rounded-2xl shadow-2xl flex flex-col z-50"
+          className="fixed bottom-20 right-6 w-96 h-[600px] bg-white border border-[#0F2F24]/10 rounded-2xl shadow-2xl flex flex-col z-[9999]"
         >
           <div className="flex justify-between items-center p-4 border-b border-[#0F2F24]/10 bg-gradient-to-r from-violet-600 to-indigo-600 rounded-t-2xl">
             <div className="flex items-center gap-2 text-white">
