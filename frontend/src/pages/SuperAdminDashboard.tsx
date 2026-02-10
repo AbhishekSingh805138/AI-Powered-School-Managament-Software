@@ -3,11 +3,12 @@ import { useAuth } from '../App';
 import axios from 'axios';
 import { Building2, Users, GraduationCap, LogOut, Plus, X } from 'lucide-react';
 import AIChat from '../components/AIChat';
+import { School } from '@/types';
 
 const SuperAdminDashboard: React.FC = () => {
   const { user, logout, API } = useAuth();
-  const [schools, setSchools] = useState([]);
-  const [showAddSchool, setShowAddSchool] = useState(false);
+  const [schools, setSchools] = useState<School[]>([]);
+  const [showAddSchool, setShowAddSchool] = useState<boolean>(false);
   const [newSchool, setNewSchool] = useState({
     name: '',
     address: '',
@@ -19,16 +20,16 @@ const SuperAdminDashboard: React.FC = () => {
     fetchSchools();
   }, []);
 
-  const fetchSchools = async () => {
+  const fetchSchools = async (): Promise<void> => {
     try {
-      const response = await axios.get(`${API}/schools`);
+      const response = await axios.get<School[]>(`${API}/schools`);
       setSchools(response.data);
     } catch (error) {
       console.error('Failed to fetch schools:', error);
     }
   };
 
-  const handleAddSchool = async (e) => {
+  const handleAddSchool = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     try {
       await axios.post(`${API}/schools`, newSchool);
