@@ -5,7 +5,7 @@ import { BookOpen, Calendar, TrendingUp, LogOut, FileText } from 'lucide-react';
 import AIChat from '../components/AIChat';
 import NotificationBell from '../components/NotificationBell';
 
-const StudentDashboard = () => {
+const StudentDashboard: React.FC = () => {
   const { user, logout, API } = useAuth();
   const [assignments, setAssignments] = useState([]);
   const [grades, setGrades] = useState([]);

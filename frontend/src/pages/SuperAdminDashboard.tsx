@@ -4,7 +4,7 @@ import axios from 'axios';
 import { Building2, Users, GraduationCap, LogOut, Plus, X } from 'lucide-react';
 import AIChat from '../components/AIChat';
 
-const SuperAdminDashboard = () => {
+const SuperAdminDashboard: React.FC = () => {
   const { user, logout, API } = useAuth();
   const [schools, setSchools] = useState([]);
   const [showAddSchool, setShowAddSchool] = useState(false);

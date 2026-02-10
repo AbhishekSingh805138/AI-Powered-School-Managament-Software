@@ -4,7 +4,7 @@ import axios from 'axios';
 import { Users, TrendingUp, Calendar, DollarSign, LogOut } from 'lucide-react';
 import AIChat from '../components/AIChat';
 
-const ParentDashboard = () => {
+const ParentDashboard: React.FC = () => {
   const { user, logout, API } = useAuth();
 
   return (

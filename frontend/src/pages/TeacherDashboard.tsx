@@ -5,7 +5,7 @@ import { BookOpen, Users, ClipboardCheck, LogOut, Calendar } from 'lucide-react'
 import AIChat from '../components/AIChat';
 import NotificationBell from '../components/NotificationBell';
 
-const TeacherDashboard = () => {
+const TeacherDashboard: React.FC = () => {
   const { user, logout, API } = useAuth();
   const [students, setStudents] = useState([]);
   const [assignments, setAssignments] = useState([]);
