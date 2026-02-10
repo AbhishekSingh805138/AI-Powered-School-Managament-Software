@@ -1,4 +1,4 @@
-export interface Notification {
+export interface NotificationData {
   id: string;
   tenant_id: string;
   title: string;
