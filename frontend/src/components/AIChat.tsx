@@ -1,21 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useAuth } from '../App';
 import axios from 'axios';
 import { MessageCircle, X, Send, Sparkles } from 'lucide-react';
 
-const AIChat = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState('');
-  const [loading, setLoading] = useState(false);
-  const { API } = useAuth();
-  const sessionId = React.useRef(`session-${Date.now()}`);
+interface Message {
+  role: 'user' | 'assistant';
+  content: string;
+}
 
-  const sendMessage = async (e) => {
+const AIChat: React.FC = () => {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
+  const { API } = useAuth();
+  const sessionId = useRef<string>(`session-${Date.now()}`);
+
+  const sendMessage = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     if (!input.trim() || loading) return;
 
-    const userMessage = { role: 'user', content: input };
+    const userMessage: Message = { role: 'user', content: input };
     setMessages((prev) => [...prev, userMessage]);
     setInput('');
     setLoading(true);
@@ -26,11 +31,11 @@ const AIChat = () => {
         session_id: sessionId.current
       });
       
-      const aiMessage = { role: 'assistant', content: response.data.response };
+      const aiMessage: Message = { role: 'assistant', content: response.data.response };
       setMessages((prev) => [...prev, aiMessage]);
     } catch (error) {
       console.error('AI chat error:', error);
-      const errorMessage = {
+      const errorMessage: Message = {
         role: 'assistant',
         content: 'Sorry, I encountered an error. Please try again.'
       };
